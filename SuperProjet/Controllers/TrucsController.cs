@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperProjet.Data;
 using SuperProjet.Models;
+using SuperProjet.Services;
 
 namespace SuperProjet.Controllers
 {
@@ -14,61 +15,58 @@ namespace SuperProjet.Controllers
     [ApiController]
     public class TrucsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly TrucsService _service;
 
-        public TrucsController(ApplicationDbContext context)
+        public TrucsController(TrucsService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: api/Trucs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Trucs>>> GetTrucs()
+        public async Task<ActionResult<IEnumerable<Truc>>> Get()
         {
-          if (_context.Trucs == null)
-          {
-              return NotFound();
-          }
-            return await _context.Trucs.ToListAsync();
+            if (_service.GetAll() == null)
+            {
+                return NotFound();
+            }
+            return await _service.GetAll().ToListAsync();
         }
 
         // GET: api/Trucs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Trucs>> GetTrucs(int id)
+        public async Task<ActionResult<Truc>> Get(int id)
         {
-          if (_context.Trucs == null)
-          {
-              return NotFound();
-          }
-            var trucs = await _context.Trucs.FindAsync(id);
+            if (_service.GetAll() == null)
+            {
+                return NotFound();
+            }
+            var item = _service.Get(id);
 
-            if (trucs == null)
+            if (item == null)
             {
                 return NotFound();
             }
 
-            return trucs;
+            return item;
         }
 
         // PUT: api/Trucs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTrucs(int id, Trucs trucs)
+        public async Task<IActionResult> Put(int id, Truc truc)
         {
-            if (id != trucs.Id)
+            if (id != truc.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(trucs).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                _service.Update(truc);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TrucsExists(id))
+                if (!TrucExists(id))
                 {
                     return NotFound();
                 }
@@ -84,41 +82,38 @@ namespace SuperProjet.Controllers
         // POST: api/Trucs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Trucs>> PostTrucs(Trucs trucs)
+        public async Task<ActionResult<Truc>> Post(Truc truc)
         {
-          if (_context.Trucs == null)
-          {
-              return Problem("Entity set 'ApplicationDbContext.Trucs'  is null.");
-          }
-            _context.Trucs.Add(trucs);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetTrucs", new { id = trucs.Id }, trucs);
+            if (_service.GetAll() == null)
+            {
+                return Problem("Entity set is null.");
+            }
+            _service.Add(truc);
+            
+            return CreatedAtAction("Get", new { id = truc.Id }, truc);
         }
 
         // DELETE: api/Trucs/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrucs(int id)
         {
-            if (_context.Trucs == null)
+            if (_service.GetAll() == null)
             {
                 return NotFound();
             }
-            var trucs = await _context.Trucs.FindAsync(id);
-            if (trucs == null)
+            Truc? truc = _service.Delete(id);
+            
+            if (truc == null)
             {
                 return NotFound();
             }
-
-            _context.Trucs.Remove(trucs);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TrucsExists(int id)
+        private bool TrucExists(int id)
         {
-            return (_context.Trucs?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _service.Exists(id);
         }
     }
 }
