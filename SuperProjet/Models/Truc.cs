@@ -1,6 +1,8 @@
-﻿namespace SuperProjet.Models
+﻿using SuperProjet.Services;
+
+namespace SuperProjet.Models
 {
-    public class Trucs
+    public class Truc: IModel
     {
         public int Id { get; set; }
         public string Description { get; set; } = "";
