@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SuperProjet.Data;
 
@@ -11,11 +10,9 @@ using SuperProjet.Data;
 namespace SuperProjet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231019183858_init")]
-    partial class init
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.12");
@@ -216,7 +213,25 @@ namespace SuperProjet.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SuperProjet.Models.Problems", b =>
+            modelBuilder.Entity("SuperProjet.Models.Conflit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Boom")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Conflit");
+                });
+
+            modelBuilder.Entity("SuperProjet.Models.Problem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -231,7 +246,7 @@ namespace SuperProjet.Migrations
                     b.ToTable("Problems");
                 });
 
-            modelBuilder.Entity("SuperProjet.Models.Trucs", b =>
+            modelBuilder.Entity("SuperProjet.Models.Truc", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
