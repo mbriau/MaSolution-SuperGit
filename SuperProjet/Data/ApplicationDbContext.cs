@@ -10,8 +10,8 @@ namespace SuperProjet.Data
             : base(options)
         {
         }
-        public DbSet<SuperProjet.Models.Trucs> Trucs { get; set; } = default!;
-        public DbSet<SuperProjet.Models.Problems> Problems { get; set; } = default!;
+        public DbSet<Truc> Trucs { get; set; } = default!;
+        public DbSet<SuperProjet.Models.Problem> Problems { get; set; } = default!;
         public DbSet<SuperProjet.Models.Conflit> Conflit { get; set; } = default!;
     }
 }
