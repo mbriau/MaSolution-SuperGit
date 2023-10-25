@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperProjet.Data;
 using SuperProjet.Models;
+using SuperProjet.Services;
 
 namespace SuperProjet.Controllers
 {
@@ -14,57 +15,54 @@ namespace SuperProjet.Controllers
     [ApiController]
     public class ProblemsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ProblemsService _service;
 
-        public ProblemsController(ApplicationDbContext context)
+        public ProblemsController(ProblemsService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: api/Problems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Problems>>> GetProblems()
+        public async Task<ActionResult<IEnumerable<Problem>>> Get()
         {
-          if (_context.Problems == null)
-          {
-              return NotFound();
-          }
-            return await _context.Problems.ToListAsync();
+            if (_service.GetAll() == null)
+            {
+                return NotFound();
+            }
+            return await _service.GetAll().ToListAsync();
         }
 
         // GET: api/Problems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Problems>> GetProblems(int id)
+        public async Task<ActionResult<Problem>> Get(int id)
         {
-          if (_context.Problems == null)
-          {
-              return NotFound();
-          }
-            var problems = await _context.Problems.FindAsync(id);
+            if (_service.GetAll() == null)
+            {
+                return NotFound();
+            }
+            var item = _service.Get(id);
 
-            if (problems == null)
+            if (item == null)
             {
                 return NotFound();
             }
 
-            return problems;
+            return item;
         }
 
         // PUT: api/Problems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProblems(int id, Problems problems)
+        public async Task<IActionResult> Put(int id, Problem problem)
         {
-            if (id != problems.Id)
+            if (id != problem.Id)
             {
                 return BadRequest();
             }
-
-            _context.Entry(problems).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                _service.Update(problem);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -84,41 +82,38 @@ namespace SuperProjet.Controllers
         // POST: api/Problems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Problems>> PostProblems(Problems problems)
+        public async Task<ActionResult<Problem>> Post(Problem problem)
         {
-          if (_context.Problems == null)
-          {
-              return Problem("Entity set 'ApplicationDbContext.Problems'  is null.");
-          }
-            _context.Problems.Add(problems);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProblems", new { id = problems.Id }, problems);
+            if (_service.GetAll() == null)
+            {
+                return Problem("Entity set is null.");
+            }
+            _service.Add(problem);
+            
+            return CreatedAtAction("Get", new { id = problem.Id }, problem);
         }
 
         // DELETE: api/Problems/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProblems(int id)
         {
-            if (_context.Problems == null)
+            if (_service.GetAll() == null)
             {
                 return NotFound();
             }
-            var problems = await _context.Problems.FindAsync(id);
-            if (problems == null)
+            Problem? problem = _service.Delete(id);
+            
+            if (problem == null)
             {
                 return NotFound();
             }
-
-            _context.Problems.Remove(problems);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool ProblemsExists(int id)
         {
-            return (_context.Problems?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _service.Exists(id);
         }
     }
 }
